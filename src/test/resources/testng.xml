@@ -4,7 +4,22 @@
     <parameter name="url" value="https://freegeoip.app/"/>
     <parameter name="longitude" value="41.6477291292777"/>
     <parameter name="latitude" value="41.64284118816131"/>
-    <test name="task2" verbose="1" preserve-order="true">
+    <test name="web" verbose="1" preserve-order="true">
+        <groups>
+            <run>
+                <include name = "web"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.aroygas.kivork.KivorkTest"/>
+        </classes>
+    </test>
+    <test name="api" verbose="1" preserve-order="true">
+        <groups>
+            <run>
+                <include name = "api"/>
+            </run>
+        </groups>
         <classes>
             <class name="com.aroygas.kivork.KivorkTest"/>
         </classes>
