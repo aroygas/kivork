@@ -7,7 +7,7 @@
     <test name="web" verbose="1" preserve-order="true">
         <groups>
             <run>
-                <include name = "newtab"/>
+                <include name = "unload"/>
             </run>
         </groups>
         <classes>

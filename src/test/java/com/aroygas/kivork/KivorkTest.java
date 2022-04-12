@@ -2,7 +2,9 @@ package com.aroygas.kivork;
 
 import com.codeborne.selenide.Selenide;
 import io.restassured.response.Response;
+import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -10,10 +12,12 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Condition.appear;
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Selectors.*;
-import static com.codeborne.selenide.WebDriverRunner.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 
@@ -32,14 +36,12 @@ public class KivorkTest {
         //This kind of code can be put in some wrapper
         for(int i=0; i<=maxTries; i++){
             try{
-                $(byId("java_own_ip")).should(appear); // Waits until element appear, timeout can be set
-                $(byId("java_own_ip")).shouldHave(text("String apikey = \"XXXXXXXXXXXXXX\";")); //Assert text
+                WebElement element = $(byId("java_own_ip")).should(appear); // Waits until element appear
+                Assert.assertTrue(element.getText().contains("String apikey = \"XXXXXXXXXXXXXX\";"));
                 break;
-            }
-            catch(StaleElementReferenceException e){
+            } catch(StaleElementReferenceException e){
                 //To my knowledge the only way to rebuild the DOM is refreshing the page
-                Selenide.refresh(); //Refreshes the page
-                System.out.println(e.getMessage());
+                Selenide.refresh(); //Refresh the page
             }
         }
     }
@@ -62,12 +64,31 @@ public class KivorkTest {
     public void SwitchTabsTest (String url) {
         Selenide.open(url);
         $(byText("Get Free Apikey")).click(); //Click on button that opens new tab
-
+        //Collecting all tabs
         List<String> tabs = new ArrayList<String>(getWebDriver().getWindowHandles());
         Selenide.switchTo().window(tabs.get(1)); // Switching to new tab
         $("title").shouldHave(attribute("text", "freegeoip"));//Assert page title
         Selenide.switchTo().window(tabs.get(0)); // Switching to old tab
         $("title").shouldHave(attribute("text",
                 "Free IP Geolocation API - FreeGeoIP.app"));//Assert page title
+    }
+
+    @Test (groups = {"web", "unload"})
+    @Parameters({"url"})
+    public void UnloadTest (String url) {
+        int maxTries = 3;
+        Selenide.open(url);
+        WebElement element = getWebDriver().findElement(By.xpath("//a[@href = '/register']"));
+        element.click(); //Click on button that opens new window
+
+        //This kind of code can be put in some wrapper
+        for(int i=0; i<=maxTries; i++) {
+            try {
+                element.getText();
+                //If the page was unloaded old DOM should be destroyed StaleElementReferenceException should be thrown
+            } catch (StaleElementReferenceException e) {
+                break;
+            }
+        }
     }
 }
