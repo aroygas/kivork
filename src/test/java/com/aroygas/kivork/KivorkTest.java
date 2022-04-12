@@ -8,9 +8,11 @@ import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.codeborne.selenide.Condition.appear;
 import static com.codeborne.selenide.Condition.attribute;
@@ -40,8 +42,7 @@ public class KivorkTest {
                 Assert.assertTrue(element.getText().contains("String apikey = \"XXXXXXXXXXXXXX\";"));
                 break;
             } catch(StaleElementReferenceException e){
-                //To my knowledge the only way to rebuild the DOM is refreshing the page
-                Selenide.refresh(); //Refresh the page
+                Selenide.refresh(); //Rebuilding DOM by refreshing the page
             }
         }
     }
@@ -49,14 +50,14 @@ public class KivorkTest {
     @Test (groups = {"api"})
     @Parameters({"url", "longitude", "latitude"})
     public void APICallTest (String url, float longitude, float latitude) {
-        Response response = given().
-                contentType(JSON).
-                get(url + "json");
+        SoftAssert softAssert = new SoftAssert();
+        Response response = given().contentType(JSON).get(url + "json");
         response.then().assertThat().statusCode(200); //a) Assert the response code;
-        response.getBody().prettyPrint(); //b) Parse the response;
+        Map<String, Object> resultMap = response.jsonPath().getMap("$");//b) Parse the response;
         //c) Assert your latitude and longitude with a 0.01° tolerance
-        Assert.assertEquals(response.jsonPath().getFloat("longitude"),  longitude, 0.01);
-        Assert.assertEquals(response.jsonPath().getFloat("latitude"),  latitude, 0.01);
+        softAssert.assertEquals(Float.parseFloat(resultMap.get("longitude").toString()),  longitude, 0.01);
+        softAssert.assertEquals(Float.parseFloat(resultMap.get("latitude").toString()),  latitude, 0.01);
+        softAssert.assertAll();
     }
 
     @Test (groups = {"web", "newtab"})
