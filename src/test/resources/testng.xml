@@ -7,21 +7,21 @@
     <test name="web" verbose="1" preserve-order="true">
         <groups>
             <run>
-                <include name = "web"/>
+                <include name = "newtab"/>
             </run>
         </groups>
         <classes>
             <class name="com.aroygas.kivork.KivorkTest"/>
         </classes>
     </test>
-    <test name="api" verbose="1" preserve-order="true">
-        <groups>
-            <run>
-                <include name = "api"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="com.aroygas.kivork.KivorkTest"/>
-        </classes>
-    </test>
+<!--    <test name="api" verbose="1" preserve-order="true">-->
+<!--        <groups>-->
+<!--            <run>-->
+<!--                <include name = "api"/>-->
+<!--            </run>-->
+<!--        </groups>-->
+<!--        <classes>-->
+<!--            <class name="com.aroygas.kivork.KivorkTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>
